@@ -16,7 +16,7 @@
 
 
 
-<script>
+<!-- <script>
   function pollForPlayerField() {
       var xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function() {
@@ -35,6 +35,27 @@
   document.addEventListener('DOMContentLoaded', () => {
       pollForPlayerField();
   });
-</script>
+</script> -->
+<script>
+    function checkPlayerField() {
+      $.ajax({
+        url: '/waiting/',
+        success: function(data) {
+          if (data.filled) {
+            // Поле заполнено, перенаправляем на страницу game
+            window.location.href = '/game';
+          } else {
+            // Поле не заполнено, повторяем проверку через 1 секунду
+            setTimeout(checkPlayerField, 1000);
+          }
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      // Начинаем проверку при загрузке страницы
+      checkPlayerField();
+    });
+  </script>
 
 {% endblock %}

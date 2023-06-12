@@ -1,7 +1,7 @@
 {% extends 'game/base.html' %}
 
 {% block content %}
-<div class="container text-center">
+<div class="container text-center" id='content1'>
   <h1 class="text-warning">Tic Tac Toe of {{ game.creator.username }}</h1>
   {% if game.is_finished %}
       {% if game.is_draw %}
@@ -16,7 +16,7 @@
 </div>
 
 {% endif %}
-<div class="container text-center">
+<div class="container text-center" id='content2'>
   <div class="row justify-content-center">
     <div class="col-7">
       <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
@@ -62,7 +62,7 @@
 
 
 
-<script>
+<!-- <script>
   function pollForPlayerField() {
       var xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function() {
@@ -81,5 +81,37 @@
   document.addEventListener('DOMContentLoaded', () => {
       pollForPlayerField();
   });
+</script> -->
+<script>
+function checkFieldChanges() {
+    var lastFieldValue = "---------";
+
+    setInterval(function() {
+        $.ajax({
+            url: '/game/waitingmove/',  // Укажите правильный URL для вашего представления
+            data: {
+                last_field_value: lastFieldValue
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.changed) {
+                    // Поле изменилось
+                    var field_value = response.field_value;
+                    // window.location.reload()
+                    $('#content1').load(window.location.href + ' #content1');
+                    $('#content2').load(window.location.href + ' #content2');
+                    // Обновите ваше представление или выполните другие действия при изменении поля
+                } else {
+                    // Поле не изменилось
+                }
+                lastFieldValue = response.field_value;
+            }
+        });
+    }, 1000);  // Измените интервал на то значение, которое вам нужно
+}
+
+$(document).ready(function() {
+    checkFieldChanges();
+});
 </script>
 {% endblock %}

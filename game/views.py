@@ -18,7 +18,7 @@ def home(request):
         game.delete()
     except:
         pass
-    return render(request, 'game\home.html')
+    return render(request, 'game/home.html')
 
 
 @login_required
@@ -34,7 +34,7 @@ def creategame(request):
         player = ''
     )
     game.save()
-    return render(request, 'game\waiting.html')
+    return render(request, 'game/waiting.html')
 
 
 @login_required
@@ -43,7 +43,7 @@ def game(request):
     games = TicTacToe.objects.all()
     for game in games:
         if game.creator == request.user or game.player == request.user.username:
-            return render(request, 'game\game.html', {"game": game, "player":game.get_current_player()})
+            return render(request, 'game/game.html', {"game": game, "player":game.get_current_player()})
     else:
         return redirect('home')
 
@@ -59,24 +59,49 @@ def make_move(request, position):
     return redirect('game:game')
 
 
+# @login_required
+# async def waitingplayer(request):
+#     game = get_object_or_404(TicTacToe, creator=request.user)
+#     while not game.player:
+#         game = get_object_or_404(TicTacToe, creator=request.user)
+#         await asyncio.sleep(1)  # Приостановка выполнения на 1 секунду
+#     return HttpResponse('Player field is filled')
+
 @login_required
 def waitingplayer(request):
     game = get_object_or_404(TicTacToe, creator=request.user)
-    while not game.player:
-        game = get_object_or_404(TicTacToe, creator=request.user)
-        time.sleep(1)  # Приостановка выполнения на 1 секунду
-    return HttpResponse('Player field is filled')
+    if game.player:
+        return JsonResponse({'filled': True})
+    else:
+        return JsonResponse({'filled': False})
+
+# @login_required
+# async def waitingmove(request):
+#     game = TicTacToe.objects.filter(Q(creator=request.user) | Q(player=request.user.username))[0]
+#     board = game.board
+#     while game.board == board:
+#         game1 = TicTacToe.objects.filter(Q(creator=request.user) | Q(player=request.user.username))[0]
+#         board = game1.board
+#         await asyncio.sleep(1)  # Приостановка выполнения на 1 секунду
+#     return HttpResponse('Player field is filled')
 
 @login_required
 def waitingmove(request):
-    game = TicTacToe.objects.filter(Q(creator=request.user) | Q(player=request.user.username))[0]
-    board = game.board
-    while game.board == board:
-        game1 = TicTacToe.objects.filter(Q(creator=request.user) | Q(player=request.user.username))[0]
-        board = game1.board
-        time.sleep(1)  # Приостановка выполнения на 1 секунду
-    return HttpResponse('Player field is filled')
+    game = TicTacToe.objects.get(Q(creator=request.user) | Q(player=request.user.username))
 
+    # Получите значение поля, которое вы хотите проверить на изменение
+    field_value = str(game.board)
+
+    # Получите значение, которое вы сохраните на клиентской стороне
+    last_field_value = str(request.GET.get('last_field_value', None))
+
+    # Проверьте, изменилось ли поле после последнего обновления
+    if last_field_value and (field_value != last_field_value):
+        # Поле изменилось
+        return JsonResponse({'changed': True, 'field_value': field_value})
+    else:
+        # Поле не изменилось
+        return JsonResponse({'changed': False})
 
 @login_required
 def servers(request):
@@ -86,7 +111,7 @@ def servers(request):
     except TicTacToe.DoesNotExist:
         pass
     games = TicTacToe.objects.filter(Q(player='') | Q(player=request.user.username))
-    return render(request, "game\servers.html", {'games':games, "user":request.user})
+    return render(request, "game/servers.html", {'games':games, "user":request.user})
 
 
 @login_required
@@ -103,9 +128,9 @@ def serverjoin(request, username):
 
 def singupuser(request):
     if request.method == "GET":
-        return render(request, 'game\singupuser.html', {"form": UserCreationForm()})
+        return render(request, 'game/singupuser.html', {"form": UserCreationForm()})
     elif request.method == "POST":
-        if request.POST['password1'] == request.POST['password2']:
+        if request.POST['password1'] == request.POST['password2'] and len(request.POST['password1']) >= 4:
             try:
                 user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                 user.save()
@@ -114,7 +139,7 @@ def singupuser(request):
             except IntegrityError:
                 return render(request, 'game/singupuser.html', {"form": UserCreationForm(), 'error': "That username has been taken"})
         else:
-            return render(request, 'game/singupuser.html', {"form": UserCreationForm(), 'error': "Passwords didn't match"})
+            return render(request, 'game/singupuser.html', {"form": UserCreationForm(), 'error': "Passwords didn't match or too short"})
 
 
 def loginuser(request):

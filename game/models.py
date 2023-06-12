@@ -10,6 +10,8 @@ class TicTacToe(models.Model):
     winner = models.CharField(max_length=100, default='', blank=True)
     is_draw = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now=True)
+
 
     def make_move(self, position):  #int [0, 8]
         if not self.is_finished and self.board[position] == '-':
