@@ -1,0 +1,29 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-7">
+      <h1 class="mb-4">Sing Up</h1>
+      {{ error }}
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input class="form-control" id="username" name="username">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" name="password1">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password confirmation</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" name="password2">
+        </div>
+        <button type="submit" class="btn btn-primary">Sing Up</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

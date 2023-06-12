@@ -1,0 +1,85 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="container text-center">
+  <h1 class="text-warning">Tic Tac Toe of {{ game.creator.username }}</h1>
+  {% if game.is_finished %}
+      {% if game.is_draw %}
+          <h1 class="text-primary mb-3"><b>It's a draw!</b></h1>
+      {% else %}
+          <h1 class="text-primary mb-3"><b>{{ game.winner }} wins!</b></h1>
+      {% endif %}
+      <a class="btn btn-outline-info" href="{% url 'creategame' %}">Play again</a><br><br>
+  {% else %}
+
+  <h1 class="text-info mb-4 mt-3">move {{ game.current_player }} - {{ player }}</h1>
+</div>
+
+{% endif %}
+<div class="container text-center">
+  <div class="row justify-content-center">
+    <div class="col-7">
+      <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+        {% if game.get_current_player == user.username %}
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 0 %}">{{ game.board.0 }}</a>
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 1 %}">{{ game.board.1 }}</a>
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 2 %}">{{ game.board.2 }}</a>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 3 %}">{{ game.board.3 }}</a>
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 4 %}">{{ game.board.4 }}</a>
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 5 %}">{{ game.board.5 }}</a>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 6 %}">{{ game.board.6 }}</a>
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 7 %}">{{ game.board.7 }}</a>
+          <a class="btn btn-warning p-5" href="{% url 'game:make_move' 8 %}">{{ game.board.8 }}</a>
+        </div>
+        {% else %}
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 0 %}">{{ game.board.0 }}</a>
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 1 %}">{{ game.board.1 }}</a>
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 2 %}">{{ game.board.2 }}</a>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 3 %}">{{ game.board.3 }}</a>
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 4 %}">{{ game.board.4 }}</a>
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 5 %}">{{ game.board.5 }}</a>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 6 %}">{{ game.board.6 }}</a>
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 7 %}">{{ game.board.7 }}</a>
+          <a class="btn btn-secondary p-5" href="{% url 'game:make_move' 8 %}">{{ game.board.8 }}</a>
+        </div>
+        {% endif %}
+      </div>
+      <br><br><a class="btn btn-outline-primary" href="{% url 'home' %}">Home</a><br>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  function pollForPlayerField() {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                  window.location.href = "{% url 'game:game' %}";  // перенаправление на страницу "game"
+              } else {
+                  pollForPlayerField();  // повторный опрос, если поле еще не заполнено
+              }
+          }
+      };
+      xhr.open('GET', "{% url 'game:waitingmove' %}", true);
+      xhr.send();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+      pollForPlayerField();
+  });
+</script>
+{% endblock %}

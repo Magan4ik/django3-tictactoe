@@ -1,0 +1,32 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+<div class="container text-center">
+  <div class="row d-flex align-items-center justify-content-center" style="height: 75vh;">
+    <div class="col-7">
+      <p class="display-1 text-info">Welcome {{ user.username }}!</p>
+      <p class="fs-4">Here you can play classic tic-tac-toe with your friends. All you need is to <b class="text-success ">create a game</b> and have your friend <b class="text-warning">find you in the server</b> list. Good luck!</p>
+      <a class="btn btn-success" href="{% url 'creategame' %}">Create game</a>
+      <a class="btn btn-warning" href="{% url 'servers' %}">Servers</a>
+
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container text-center">
+  <div class="row d-flex align-items-center justify-content-center" style="height: 75vh;">
+    <div class="col-7">
+      <p class="display-1 text-info">Welcome User!</p>
+      <p class="fs-4">Here you can play classic tic-tac-toe with your friends. All you need is to create a game and have your friend find you in the server list.</p>
+      <p class="fs-4 text-warning">But before that, you need to <b class="text-success">sing up</b> or <b class="text-info">login</b></p>
+      <a class="btn btn-success" href="{% url 'singupuser' %}">Sing Up</a>
+      <a class="btn btn-info" href="{% url 'loginuser' %}">Login</a>
+
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
